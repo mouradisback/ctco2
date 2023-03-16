@@ -111,7 +111,7 @@ router.get('/supplier/:id', async (req, res)=>{
 
 var storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, './public/price-list');
+      cb(null, './public');
     },
     filename: (req, file, cb) => {
       var filetype = '';
