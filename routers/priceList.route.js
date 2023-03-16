@@ -140,7 +140,34 @@ router.post('/', upload.single('file'), async(req, res)=>{
     
    
     if(!req.file){
-console.log('no file recieved')
+
+        let pricelist = new Pricelist({
+            created_at: Date.now(),
+            type: req.body.type,
+            date: req.body.date,
+            ref: req.body.ref,
+            status: req.body.status,
+            order: req.body.order,
+            supplier_ref: req.body.supplier_ref,
+            supplier: req.body.supplier,
+            items: JSON.parse(req.body.items),
+            attached_file_url: '',
+            price_validity: req.body.price_validity
+           
+        })
+
+        pricelist = await pricelist.save()
+
+       if(pricelist){
+      
+            return res.status(200).send(pricelist)
+        
+    
+        }else{
+        return res.status(500).send('error adding pricelist')
+    }
+
+     
     }
     else{
 
@@ -174,8 +201,6 @@ console.log('no file recieved')
 
 
 })
-
-
  
 router.put('/:id', async(req, res)=>{
 
