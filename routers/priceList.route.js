@@ -109,9 +109,20 @@ router.get('/supplier/:id', async (req, res)=>{
     }
 })
 
+const dir = './public/price-list'
+const fs = require('fs')
+
+if (fs.existsSync(dir)) {
+  console.log('Directory exists!')
+} else {
+  console.log('Directory not found.')
+  fs.mkdirSync(dir)
+  
+}
+
 var storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, './public');
+      cb(null, dir);
     },
     filename: (req, file, cb) => {
       var filetype = '';
