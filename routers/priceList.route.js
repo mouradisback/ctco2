@@ -121,6 +121,7 @@ if (fs.existsSync(dir)) {
 }
 
 var storage = multer.diskStorage({
+
     destination: (req, file, cb) => {
       cb(null, dir);
     },
@@ -138,9 +139,24 @@ var storage = multer.diskStorage({
       else{
         filetype = 'pdf';
       }
-      cb(null, 'proforma-' + Date.now() + '.' + filetype);
+      cb(null, setFileName(file, filetype));
     }
 });
+
+function setFileName(file, filetype){
+
+        
+        if (fs.existsSync(dir+'/'+file.filename)) {
+            console.log('exist')
+            return file.filename
+        }else{
+            console.log('does not exist')
+            return 'proforma-' + Date.now() + '.' + filetype
+        }
+
+    
+
+}
 
 var upload = multer({storage: storage});
 
@@ -212,32 +228,81 @@ router.post('/', upload.single('file'), async(req, res)=>{
 
 
 })
+
+
  
-router.put('/:id', async(req, res)=>{
+router.put('/:id', upload.single('file'), async(req, res)=>{
 
-    
-    const pricelist = await Pricelist.findByIdAndUpdate(req.params.id, {
-        
-        created_at: req.body.created_at,
-        modified_at: Date.now(),
-        type: req.body.type,
-        date: req.body.date,
-        ref: req.body.ref,
-        status: req.body.status,
-        order: req.body.order,
-        supplier_ref: req.body.supplier_ref,
-        supplier: req.body.supplier,
-        items: req.body.items,
-        price_validity: req.body.price_validity
-        
-    }, { new: true});
 
-    
-    if(pricelist){
-        return res.status(200).send(pricelist)
-    }else{
-        return res.status(500).send('error updating pricelist')
+    if(!req.file){
+
+        const pricelist = await Pricelist.findByIdAndUpdate(req.params.id, {
+        
+            created_at: req.body.created_at,
+            modified_at: Date.now(),
+            type: req.body.type,
+            date: req.body.date,
+            ref: req.body.ref,
+            status: req.body.status,
+            order: req.body.order,
+            supplier_ref: req.body.supplier_ref,
+            supplier: req.body.supplier,
+            items: JSON.parse(req.body.items),
+            attached_file_url: req.file.filename,
+            price_validity: req.body.price_validity
+            
+            }, { new: true});
+
+            if(pricelist){
+      
+                return res.status(200).send(pricelist)
+            
+        
+             }else{
+               return res.status(500).send('error editing pricelist')
+        }
+
+
+      
     }
+
+    else {
+        
+
+        const pricelist = await Pricelist.findByIdAndUpdate(req.params.id, {
+        
+            created_at: req.body.created_at,
+            modified_at: Date.now(),
+            type: req.body.type,
+            date: req.body.date,
+            ref: req.body.ref,
+            status: req.body.status,
+            order: req.body.order,
+            supplier_ref: req.body.supplier_ref,
+            supplier: req.body.supplier,
+            attached_file_url: req.file.filename,
+            items: JSON.parse(req.body.items),
+            price_validity: req.body.price_validity
+            
+        }, { new: true});
+
+        if(pricelist){
+      
+            return res.status(200).send(pricelist)
+        
+    
+         }else{
+           return res.status(500).send('error editing pricelist')
+    }
+
+    }
+
+  
+    
+   
+
+    
+    
 
 })
 
